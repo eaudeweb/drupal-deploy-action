@@ -18,6 +18,8 @@ jobs:
           ssh_user:         ${{ secrets.TEST_SSH_USER }}
           ssh_host:         ${{ secrets.TEST_SSH_HOST }}
           ssh_key:          ${{ secrets.TEST_SSH_KEY }}
+          check_config:     false
+          sql_backup:       false
 ```
 
 
@@ -29,3 +31,5 @@ jobs:
 - `ssh_user`         - SSH user account
 - `ssh_host`         - SSH host server (IP or public hostname)
 - `ssh_key`          - SSH private key
+- `check_config`     - Check if there are configuration changes in the Drupal database not exported in config. Fail if true.
+- `sql_backup`       - Create a SQL database backup before doing the deployment (with release filename)

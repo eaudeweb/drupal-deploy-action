@@ -19,6 +19,14 @@ inputs:
   ssh_key:
     description: 'SSH private key'
     required: true
+  check_config:
+    description: 'Check if there are configuration changes in the Drupal database not exported in config. Fail if true.'
+    required: false
+    default: 'false'
+  sql_backup:
+    description: 'Create a SQL database backup before doing the deployment (with release filename)'
+    required: false
+    default: 'false'
 
 runs:
   using: "composite"
@@ -42,6 +50,14 @@ runs:
         SSH_KEY: ${{ inputs.ssh_key }}
       shell: bash
 
+    - name: 'Check for Drupal schema changes'
+      if:  ${{ inputs.check_config == 'true' }}
+      run: ssh server 'cd ${{ inputs.project_dir }}/live && CONFIG_STATUS=$(./vendor/bin/drush config:status -n 2>&1) && echo ${CONFIG_STATUS} | grep -i -q -s "No differences"'
+
+    - name: 'Create SQL database backup'
+      if:  ${{ inputs.sql_backup == 'true' }}
+      run: ssh server 'cd ${{ inputs.project_dir }}/live && ./vendor/bin/drush sql:dump --structure-tables-list=cache,cache_*,watchdog,sessions,history --result-file=${{ inputs.project_dir }}/database-before-${{ needs.build.outputs.base }}.sql --gzip'
+
     - name: 'Deploy release to the server'
       run: |
         ssh server 'rm -rf ${{ inputs.project_dir }}/${{ inputs.release_id }} && mkdir -p ${{ inputs.project_dir }}/${{ inputs.release_id }}'
@@ -52,3 +68,6 @@ runs:
         ssh server 'cd ${{ inputs.project_dir }} && ln -s ${{ inputs.project_dir }}/files ./${{ inputs.release_id }}/web/sites/default/files'
         ssh server 'cd ${{ inputs.project_dir }} && rm -f live && ln -s ${{ inputs.release_id }} live'
       shell: bash
+
+#      - name: 'Clean releases older than 90 days'
+#        run:  ssh server 'cd ${{ secrets.DEV_PROJECT_DIR }} && find release-* -maxdepth 1 -type d -mtime +90 -prune -exec rm -rf {} \;'
