@@ -53,10 +53,12 @@ runs:
     - name: 'Check for Drupal schema changes'
       if:  ${{ inputs.check_config == 'true' }}
       run: ssh server 'cd ${{ inputs.project_dir }}/live && CONFIG_STATUS=$(./vendor/bin/drush config:status -n 2>&1) && echo ${CONFIG_STATUS} | grep -i -q -s "No differences"'
+      shell: bash
 
     - name: 'Create SQL database backup'
       if:  ${{ inputs.sql_backup == 'true' }}
       run: ssh server 'cd ${{ inputs.project_dir }}/live && ./vendor/bin/drush sql:dump --structure-tables-list=cache,cache_*,watchdog,sessions,history --result-file=${{ inputs.project_dir }}/database-before-${{ needs.build.outputs.base }}.sql --gzip'
+      shell: bash
 
     - name: 'Deploy release to the server'
       run: |
