@@ -1,0 +1,52 @@
+name: 'Deploy a release to the server'
+description: 'Copy and configure a new release to the target server'
+inputs:
+  project_dir:
+    description: 'Absolute path where the project root is configured (where live symlink exists)'
+    required: true
+  release_id:
+    description: 'Name of the release where new release is installed (e.g. release-68cdf63)'
+    required: true
+  release_filename:
+    description: 'Name of the resulted release archive (e.g. release-68cdf63.tar.gz)'
+    required: true
+  ssh_user:
+    description: 'SSH user account'
+    required: true
+  ssh_host:
+    description: 'SSH host server'
+    required: true
+  ssh_key:
+    description: 'SSH private key'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: 'Configure SSH'
+      run: |
+        mkdir -p ~/.ssh/
+        echo "$SSH_KEY" > ~/.ssh/server.key
+        chmod 600 ~/.ssh/server.key
+        cat >>~/.ssh/config <<END
+        Host server
+          HostName $SSH_HOST
+          User $SSH_USER
+          IdentityFile ~/.ssh/server.key
+          StrictHostKeyChecking no
+        END
+      env:
+        SSH_USER: ${{ inputs.ssh_user }}
+        SSH_HOST: ${{ inputs.ssh_host }}
+        SSH_KEY: ${{ inputs.ssh_key }}
+
+    - name: 'Deploy release to the server'
+      run: |
+        ssh server 'rm -rf ${{ inputs.project_dir }}/${{ inputs.release_id }} && mkdir -p ${{ inputs.project_dir }}/${{ inputs.release_id }}'
+        scp ${{ inputs.release_filename }} server:${{ inputs.project_dir }}/${{ inputs.release_id }}/
+        rm ${{ inputs.release_filename }}
+        ssh server 'cd ${{ inputs.project_dir }}/${{ inputs.release_id }} && tar zxf ${{ inputs.release_filename }} && rm ${{ inputs.release_filename }}'
+        ssh server 'cd ${{ inputs.project_dir }} && ln -s ${{ inputs.project_dir }}/settings.local.php ./${{ inputs.release_id }}/web/sites/default/settings.local.php'
+        ssh server 'cd ${{ inputs.project_dir }} && ln -s ${{ inputs.project_dir }}/files ./${{ inputs.release_id }}/web/sites/default/files'
+        ssh server 'cd ${{ inputs.project_dir }} && rm -f live && ln -s ${{ inputs.release_id }} live'
