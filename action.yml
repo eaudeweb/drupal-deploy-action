@@ -57,7 +57,7 @@ runs:
 
     - name: 'Create SQL database backup'
       if:  ${{ inputs.sql_backup == 'true' }}
-      run: ssh server 'cd ${{ inputs.project_dir }}/live && ./vendor/bin/drush sql:dump --structure-tables-list=cache,cache_*,watchdog,sessions,history --result-file=${{ inputs.project_dir }}/database-before-${{ needs.build.outputs.base }}.sql --gzip'
+      run: ssh server 'cd ${{ inputs.project_dir }}/live && ./vendor/bin/drush sql:dump --structure-tables-list=cache,cache_*,watchdog,sessions,history --result-file=${{ inputs.project_dir }}/database-before-${{ inputs.release_id }}.sql --gzip'
       shell: bash
 
     - name: 'Deploy release to the server'
