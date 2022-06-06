@@ -40,6 +40,7 @@ runs:
         SSH_USER: ${{ inputs.ssh_user }}
         SSH_HOST: ${{ inputs.ssh_host }}
         SSH_KEY: ${{ inputs.ssh_key }}
+      shell: bash
 
     - name: 'Deploy release to the server'
       run: |
@@ -50,3 +51,4 @@ runs:
         ssh server 'cd ${{ inputs.project_dir }} && ln -s ${{ inputs.project_dir }}/settings.local.php ./${{ inputs.release_id }}/web/sites/default/settings.local.php'
         ssh server 'cd ${{ inputs.project_dir }} && ln -s ${{ inputs.project_dir }}/files ./${{ inputs.release_id }}/web/sites/default/files'
         ssh server 'cd ${{ inputs.project_dir }} && rm -f live && ln -s ${{ inputs.release_id }} live'
+      shell: bash
