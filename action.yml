@@ -34,13 +34,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: 'Set variables'
-      run: |
-        export BUILD_DIR="${{ inputs.artifacts_dir }}/${{ inputs.release_id }}"
-        export LIVE_DIR="${{ inputs.artifacts_dir }}/live"
-        export PROJECT_DIR="${{ inputs.project_dir }}"
-      shell: bash
-
     - name: 'Configure SSH'
       run: |
         mkdir -p ~/.ssh/
@@ -82,4 +75,8 @@ runs:
         ssh server 'rm -f ${{env.PROJECT_DIR}}/web/modules/contrib && ln -s ${{env.LIVE_DIR}}/web/modules/contrib ${{env.PROJECT_DIR}}/web/modules/contrib'
         ssh server 'rm -f ${{env.PROJECT_DIR}}/web/profiles/contrib && ln -s ${{env.LIVE_DIR}}/web/profiles/contrib ${{env.PROJECT_DIR}}/web/profiles/contrib'
         ssh server 'rm -f ${{env.PROJECT_DIR}}/web/themes/contrib && ln -s ${{env.LIVE_DIR}}/web/themes/contrib ${{env.PROJECT_DIR}}/web/themes/contrib'
+      env:
+        BUILD_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}"
+        LIVE_DIR: "${{ inputs.artifacts_dir }}/live"
+        PROJECT_DIR: "${{ inputs.project_dir }}"
       shell: bash
