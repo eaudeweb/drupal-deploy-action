@@ -71,7 +71,7 @@ runs:
         ssh server 'rm -f ${{env.LIVE_DIR}} && ln -s ${{env.BUILD_DIR}} ${{env.LIVE_DIR}}'
         ssh server 'rm -f ${{env.PROJECT_DIR}}/vendor && ln -s ${{env.LIVE_DIR}}/vendor ${{env.PROJECT_DIR}}/vendor'
         ssh server 'rm -f ${{env.PROJECT_DIR}}/web/core && ln -s ${{env.LIVE_DIR}}/web/core ${{env.PROJECT_DIR}}/web/core'
-        ssh server 'rm -f ${{env.PROJECT_DIR}}/web/libraries && ${{env.LIVE_DIR}}/web/libraries ln -s ${{env.PROJECT_DIR}}/web/libraries'
+        ssh server 'rm -f ${{env.PROJECT_DIR}}/web/libraries && ln -s ${{env.LIVE_DIR}}/web/libraries ${{env.PROJECT_DIR}}/web/libraries'
         ssh server 'rm -f ${{env.PROJECT_DIR}}/web/modules/contrib && ln -s ${{env.LIVE_DIR}}/web/modules/contrib ${{env.PROJECT_DIR}}/web/modules/contrib'
         ssh server 'rm -f ${{env.PROJECT_DIR}}/web/profiles/contrib && ln -s ${{env.LIVE_DIR}}/web/profiles/contrib ${{env.PROJECT_DIR}}/web/profiles/contrib'
         ssh server 'rm -f ${{env.PROJECT_DIR}}/web/themes/contrib && ln -s ${{env.LIVE_DIR}}/web/themes/contrib ${{env.PROJECT_DIR}}/web/themes/contrib'
