@@ -61,25 +61,25 @@ runs:
 
     - name: 'Check for Drupal schema changes'
       if:  ${{ inputs.check_config == 'true' }}
-      run: ssh server 'cd $PROJECT_DIR && CONFIG_STATUS=$(./vendor/bin/drush config:status -n 2>&1) && echo ${CONFIG_STATUS} | grep -i -q -s "No differences"'
+      run: ssh server 'cd ${{env.PROJECT_DIR}} && CONFIG_STATUS=$(./vendor/bin/drush config:status -n 2>&1) && echo ${CONFIG_STATUS} | grep -i -q -s "No differences"'
       shell: bash
 
     - name: 'Create SQL database backup'
       if:  ${{ inputs.sql_backup == 'true' }}
-      run: ssh server 'cd $PROJECT_DIR && ./vendor/bin/drush sql:dump --structure-tables-list=cache,cache_*,watchdog,sessions,history --result-file=${{ inputs.artifacts_dir }}/database-before-${{ inputs.release_id }}.sql --gzip'
+      run: ssh server 'cd ${{env.PROJECT_DIR}} && ./vendor/bin/drush sql:dump --structure-tables-list=cache,cache_*,watchdog,sessions,history --result-file=${{ inputs.artifacts_dir }}/database-before-${{ inputs.release_id }}.sql --gzip'
       shell: bash
 
     - name: 'Deploy release to the server'
       run: |
-        ssh server 'rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR'
-        scp ${{ inputs.release_filename }} server:$BUILD_DIR/
+        ssh server 'rm -rf ${{env.BUILD_DIR}} && mkdir -p ${{env.BUILD_DIR}}'
+        scp ${{ inputs.release_filename }} server:${{env.BUILD_DIR}}/
         rm ${{ inputs.release_filename }}
-        ssh server 'cd $BUILD_DIR && tar zxf ${{ inputs.release_filename }} && rm ${{ inputs.release_filename }}'
-        ssh server 'rm -f $LIVE_DIR && ln -s $BUILD_DIR $LIVE_DIR'
-        ssh server 'rm -f $PROJECT_DIR/vendor && ln -s $LIVE_DIR/vendor $PROJECT_DIR/vendor'
-        ssh server 'rm -f $PROJECT_DIR/web/core && ln -s $LIVE_DIR/web/core $PROJECT_DIR/web/core'
-        ssh server 'rm -f $PROJECT_DIR/web/libraries && $LIVE_DIR/web/libraries ln -s $PROJECT_DIR/web/libraries'
-        ssh server 'rm -f $PROJECT_DIR/web/modules/contrib && ln -s $LIVE_DIR/web/modules/contrib $PROJECT_DIR/web/modules/contrib'
-        ssh server 'rm -f $PROJECT_DIR/web/profiles/contrib && ln -s $LIVE_DIR/web/profiles/contrib $PROJECT_DIR/web/profiles/contrib'
-        ssh server 'rm -f $PROJECT_DIR/web/themes/contrib && ln -s $LIVE_DIR/web/themes/contrib $PROJECT_DIR/web/themes/contrib'
+        ssh server 'cd ${{env.BUILD_DIR}} && tar zxf ${{ inputs.release_filename }} && rm ${{ inputs.release_filename }}'
+        ssh server 'rm -f ${{env.LIVE_DIR}} && ln -s ${{env.BUILD_DIR}} ${{env.LIVE_DIR}}'
+        ssh server 'rm -f ${{env.PROJECT_DIR}}/vendor && ln -s ${{env.LIVE_DIR}}/vendor ${{env.PROJECT_DIR}}/vendor'
+        ssh server 'rm -f ${{env.PROJECT_DIR}}/web/core && ln -s ${{env.LIVE_DIR}}/web/core ${{env.PROJECT_DIR}}/web/core'
+        ssh server 'rm -f ${{env.PROJECT_DIR}}/web/libraries && ${{env.LIVE_DIR}}/web/libraries ln -s ${{env.PROJECT_DIR}}/web/libraries'
+        ssh server 'rm -f ${{env.PROJECT_DIR}}/web/modules/contrib && ln -s ${{env.LIVE_DIR}}/web/modules/contrib ${{env.PROJECT_DIR}}/web/modules/contrib'
+        ssh server 'rm -f ${{env.PROJECT_DIR}}/web/profiles/contrib && ln -s ${{env.LIVE_DIR}}/web/profiles/contrib ${{env.PROJECT_DIR}}/web/profiles/contrib'
+        ssh server 'rm -f ${{env.PROJECT_DIR}}/web/themes/contrib && ln -s ${{env.LIVE_DIR}}/web/themes/contrib ${{env.PROJECT_DIR}}/web/themes/contrib'
       shell: bash
