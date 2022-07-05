@@ -71,14 +71,17 @@ runs:
 
     - name: 'Deploy release to the server'
       run: |
-        ssh server 'rm -rf ${{ inputs.project_dir }}/${{ inputs.release_id }} && mkdir -p ${{ inputs.project_dir }}/${{ inputs.release_id }}'
-        scp ${{ inputs.release_filename }} server:${{ inputs.project_dir }}/${{ inputs.release_id }}/
+        ssh server 'rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR'
+        scp ${{ inputs.release_filename }} server:$BUILD_DIR/
         rm ${{ inputs.release_filename }}
-        ssh server 'cd ${{ inputs.project_dir }}/${{ inputs.release_id }} && tar zxf ${{ inputs.release_filename }} && rm ${{ inputs.release_filename }}'
-        ssh server 'cd ${{ inputs.project_dir }} && ln -s ${{ inputs.project_dir }}/settings.local.php ./${{ inputs.release_id }}/web/sites/default/settings.local.php'
-        ssh server 'cd ${{ inputs.project_dir }} && ln -s ${{ inputs.project_dir }}/files ./${{ inputs.release_id }}/web/sites/default/files'
-        ssh server 'cd ${{ inputs.project_dir }} && rm -f live && ln -s ${{ inputs.release_id }} live'
+        ssh server 'cd $BUILD_DIR && tar zxf ${{ inputs.release_filename }} && rm ${{ inputs.release_filename }}'
+      # Link the live directory to the current build directory.
+        ssh server 'rm -f $LIVE_DIR && ln -s $BUILD_DIR $LIVE_DIR'
+      # The following lines are redundant if the symbolic links already exist, but we need to make sure they are pointing to the right directory.
+        ssh server 'rm -f $PROJECT_DIR/vendor && ln -s $LIVE_DIR/vendor $PROJECT_DIR/vendor'
+        ssh server 'rm -f $PROJECT_DIR/web/core && ln -s $LIVE_DIR/web/core $PROJECT_DIR/web/core'
+        ssh server 'rm -f $PROJECT_DIR/web/libraries && $LIVE_DIR/web/libraries ln -s $PROJECT_DIR/web/libraries'
+        ssh server 'rm -f $PROJECT_DIR/web/modules/contrib && ln -s $LIVE_DIR/web/modules/contrib $PROJECT_DIR/web/modules/contrib'
+        ssh server 'rm -f $PROJECT_DIR/web/profiles/contrib && ln -s $LIVE_DIR/web/profiles/contrib $PROJECT_DIR/web/profiles/contrib'
+        ssh server 'rm -f $PROJECT_DIR/web/themes/contrib && ln -s $LIVE_DIR/web/themes/contrib $PROJECT_DIR/web/themes/contrib'
       shell: bash
-
-#      - name: 'Clean releases older than 90 days'
-#        run:  ssh server 'cd ${{ secrets.DEV_PROJECT_DIR }} && find release-* -maxdepth 1 -type d -mtime +90 -prune -exec rm -rf {} \;'
