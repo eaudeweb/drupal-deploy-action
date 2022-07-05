@@ -4,6 +4,9 @@ inputs:
   project_dir:
     description: 'Absolute path where the project root is configured (where live symlink exists)'
     required: true
+  artifacts_dir:
+    description: 'Absolute path where the artifacts will be deployed'
+    required: true
   release_id:
     description: 'Name of the release where new release is installed (e.g. release-68cdf63)'
     required: true
@@ -31,6 +34,12 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: 'Set variables'
+      run: |
+        export BUILD_DIR="${{ inputs.artifacts_dir }}/${{ inputs.release_id }}"
+        export LIVE_DIR="${{ inputs.artifacts_dir }}/live"
+        export PROJECT_DIR="${{ inputs.project_dir }}"
+      shell: bash
 
     - name: 'Configure SSH'
       run: |
