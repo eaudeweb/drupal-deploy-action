@@ -75,9 +75,7 @@ runs:
         scp ${{ inputs.release_filename }} server:$BUILD_DIR/
         rm ${{ inputs.release_filename }}
         ssh server 'cd $BUILD_DIR && tar zxf ${{ inputs.release_filename }} && rm ${{ inputs.release_filename }}'
-      # Link the live directory to the current build directory.
         ssh server 'rm -f $LIVE_DIR && ln -s $BUILD_DIR $LIVE_DIR'
-      # The following lines are redundant if the symbolic links already exist, but we need to make sure they are pointing to the right directory.
         ssh server 'rm -f $PROJECT_DIR/vendor && ln -s $LIVE_DIR/vendor $PROJECT_DIR/vendor'
         ssh server 'rm -f $PROJECT_DIR/web/core && ln -s $LIVE_DIR/web/core $PROJECT_DIR/web/core'
         ssh server 'rm -f $PROJECT_DIR/web/libraries && $LIVE_DIR/web/libraries ln -s $PROJECT_DIR/web/libraries'
