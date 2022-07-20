@@ -69,12 +69,12 @@ runs:
         rm ${{ inputs.release_filename }}
         ssh server 'cd ${{env.BUILD_DIR}} && tar zxf ${{ inputs.release_filename }} && rm ${{ inputs.release_filename }}'
         ssh server 'rm -f ${{env.LIVE_DIR}} && ln -s ${{env.BUILD_DIR}} ${{env.LIVE_DIR}}'
-        ssh server 'rm -f ${{env.PROJECT_DIR}}/vendor && ln -s ${{env.LIVE_DIR}}/vendor ${{env.PROJECT_DIR}}/vendor'
-        ssh server 'rm -f ${{env.PROJECT_DIR}}/web/core && ln -s ${{env.LIVE_DIR}}/web/core ${{env.PROJECT_DIR}}/web/core'
-        ssh server 'rm -f ${{env.PROJECT_DIR}}/web/libraries && ln -s ${{env.LIVE_DIR}}/web/libraries ${{env.PROJECT_DIR}}/web/libraries'
-        ssh server 'rm -f ${{env.PROJECT_DIR}}/web/modules/contrib && ln -s ${{env.LIVE_DIR}}/web/modules/contrib ${{env.PROJECT_DIR}}/web/modules/contrib'
-        ssh server 'rm -f ${{env.PROJECT_DIR}}/web/profiles/contrib && ln -s ${{env.LIVE_DIR}}/web/profiles/contrib ${{env.PROJECT_DIR}}/web/profiles/contrib'
-        ssh server 'rm -f ${{env.PROJECT_DIR}}/web/themes/contrib && ln -s ${{env.LIVE_DIR}}/web/themes/contrib ${{env.PROJECT_DIR}}/web/themes/contrib'
+        ssh server 'rm -rf ${{env.PROJECT_DIR}}/vendor && cp -R ${{env.LIVE_DIR}}/vendor ${{env.PROJECT_DIR}}/vendor'
+        ssh server 'rm -rf ${{env.PROJECT_DIR}}/web/core && cp -R ${{env.LIVE_DIR}}/web/core ${{env.PROJECT_DIR}}/web/core'
+        ssh server 'rm -rf ${{env.PROJECT_DIR}}/web/libraries && cp -R ${{env.LIVE_DIR}}/web/libraries ${{env.PROJECT_DIR}}/web/libraries'
+        ssh server 'rm -rf ${{env.PROJECT_DIR}}/web/modules/contrib && cp -R ${{env.LIVE_DIR}}/web/modules/contrib ${{env.PROJECT_DIR}}/web/modules/contrib'
+        ssh server 'rm -rf ${{env.PROJECT_DIR}}/web/profiles/contrib && cp -R ${{env.LIVE_DIR}}/web/profiles/contrib ${{env.PROJECT_DIR}}/web/profiles/contrib'
+        ssh server 'rm -rf ${{env.PROJECT_DIR}}/web/themes/contrib && cp -R ${{env.LIVE_DIR}}/web/themes/contrib ${{env.PROJECT_DIR}}/web/themes/contrib'
       env:
         BUILD_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}"
         LIVE_DIR: "${{ inputs.artifacts_dir }}/live"
