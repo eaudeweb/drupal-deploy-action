@@ -72,9 +72,9 @@ runs:
         ssh server 'rm -rf ${{env.PROJECT_DIR}}/vendor && cp -R ${{env.LIVE_DIR}}/vendor ${{env.PROJECT_DIR}}/vendor'
         ssh server 'rm -rf ${{env.PROJECT_DIR}}/web/core && cp -R ${{env.LIVE_DIR}}/web/core ${{env.PROJECT_DIR}}/web/core'
         ssh server 'if [ -d ${{env.PROJECT_DIR}}/web/libraries ]; then rm -rf ${{env.PROJECT_DIR}}/web/libraries && cp -R ${{env.LIVE_DIR}}/web/libraries ${{env.PROJECT_DIR}}/web/libraries; fi'
-        ssh server 'if [ -d ${{env.PROJECT_DIR}}/web/modules/contrib ]; then && rm -rf ${{env.PROJECT_DIR}}/web/modules/contrib && cp -R ${{env.LIVE_DIR}}/web/modules/contrib ${{env.PROJECT_DIR}}/web/modules/contrib; fi'
-        ssh server 'if [ -d ${{env.PROJECT_DIR}}/web/profiles/contrib ]; then && rm -rf ${{env.PROJECT_DIR}}/web/profiles/contrib && cp -R ${{env.LIVE_DIR}}/web/profiles/contrib ${{env.PROJECT_DIR}}/web/profiles/contrib; fi'
-        ssh server 'if [ -d ${{env.PROJECT_DIR}}/web/themes/contrib ]; then && rm -rf ${{env.PROJECT_DIR}}/web/themes/contrib && cp -R ${{env.LIVE_DIR}}/web/themes/contrib ${{env.PROJECT_DIR}}/web/themes/contrib; fi'
+        ssh server 'if [ -d ${{env.PROJECT_DIR}}/web/modules/contrib ]; then rm -rf ${{env.PROJECT_DIR}}/web/modules/contrib && cp -R ${{env.LIVE_DIR}}/web/modules/contrib ${{env.PROJECT_DIR}}/web/modules/contrib; fi'
+        ssh server 'if [ -d ${{env.PROJECT_DIR}}/web/profiles/contrib ]; then rm -rf ${{env.PROJECT_DIR}}/web/profiles/contrib && cp -R ${{env.LIVE_DIR}}/web/profiles/contrib ${{env.PROJECT_DIR}}/web/profiles/contrib; fi'
+        ssh server 'if [ -d ${{env.PROJECT_DIR}}/web/themes/contrib ]; then rm -rf ${{env.PROJECT_DIR}}/web/themes/contrib && cp -R ${{env.LIVE_DIR}}/web/themes/contrib ${{env.PROJECT_DIR}}/web/themes/contrib; fi'
       env:
         BUILD_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}"
         LIVE_DIR: "${{ inputs.artifacts_dir }}/live"
