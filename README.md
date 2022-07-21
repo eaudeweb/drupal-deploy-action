@@ -13,6 +13,7 @@ jobs:
       - uses: cristiroma/drupal-deploy-action@main
         with:
           project_dir:      ${{ secrets.TEST_PROJECT_DIR }}
+          artifacts_dir:    ${{ secrets.TEST_ARTIFACTS_DIR }}
           release_id:       ${{ steps.artifact.outputs.base }}
           release_filename: ${{ steps.artifact.outputs.filename }}
           ssh_user:         ${{ secrets.TEST_SSH_USER }}
@@ -25,7 +26,8 @@ jobs:
 
 ## Inputs
 
-- `project_dir`      - Absolute path where the project root is configured (where live symlink exists)
+- `project_dir`      - Absolute path where the project root is configured
+- `artifacts_dir`    - Absolute path where the artifacts will be stored
 - `release_id`       - Name of the release where new release is installed (e.g. release-68cdf63)
 - `release_filename` - Name of the resulted release archive (e.g. release-68cdf63.tar.gz)
 - `ssh_user`         - SSH user account

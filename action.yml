@@ -77,6 +77,6 @@ runs:
         ssh server 'if [ -d ${{env.PROJECT_DIR}}/web/themes/contrib ]; then rm -rf ${{env.PROJECT_DIR}}/web/themes/contrib && cp -R ${{env.LIVE_DIR}}/web/themes/contrib ${{env.PROJECT_DIR}}/web/themes/contrib; fi'
       env:
         BUILD_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}"
-        LIVE_DIR: "${{ inputs.artifacts_dir }}/live"
+        LIVE_DIR: "${{ inputs.artifacts_dir }}/live" #The live directory is redundant at the moment, but will use it after https://www.drupal.org/project/drupal/issues/1792310 is fixed.
         PROJECT_DIR: "${{ inputs.project_dir }}"
       shell: bash
