@@ -69,6 +69,7 @@ runs:
       run: ssh server 'cd ${{env.PROJECT_DIR}} && ./vendor/bin/drush sql:dump --structure-tables-list=cache,cache_*,watchdog,sessions,history --result-file=${{ inputs.artifacts_dir }}/database-before-${{ inputs.release_id }}.sql --gzip'
       shell: bash
 
+    # The live directory is redundant at the moment, but will use it after https://www.drupal.org/project/drupal/issues/1792310 is fixed.
     - name: 'Deploy release to the server'
       run: |
         ssh server 'rm -rf ${{env.BUILD_DIR}} && mkdir -p ${{env.BUILD_DIR}}'
@@ -76,7 +77,6 @@ runs:
         rm ${{ inputs.release_filename }}
         ssh server 'cd ${{env.PROJECT_DIR}} && git fetch && git checkout -f ${{ inputs.ref }} && git pull -f'
         ssh server 'cd ${{env.BUILD_DIR}} && tar zxf ${{ inputs.release_filename }} && rm ${{ inputs.release_filename }}'
-# The live directory is redundant at the moment, but will use it after https://www.drupal.org/project/drupal/issues/1792310 is fixed.
         ssh server 'rm -f ${{env.LIVE_DIR}} && ln -s ${{env.BUILD_DIR}} ${{env.LIVE_DIR}}'
         ssh server 'rm -rf ${{env.PROJECT_DIR}}/vendor && cp -R ${{env.LIVE_DIR}}/vendor ${{env.PROJECT_DIR}}/vendor'
         ssh server 'rm -rf ${{env.PROJECT_DIR}}/web/core && cp -R ${{env.LIVE_DIR}}/web/core ${{env.PROJECT_DIR}}/web/core'
