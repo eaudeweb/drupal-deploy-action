@@ -18,6 +18,8 @@ jobs:
           project_dir:      ${{ secrets.TEST_PROJECT_DIR }}
           # Absolute path where the artifacts will be stored.
           artifacts_dir:    ${{ secrets.TEST_ARTIFACTS_DIR }}
+          # The number of days after which the artifacts are deleted.
+          artifacts_lifespan:    30
           # Name of the release where new release is installed (e.g. release-68cdf63).
           release_id:       ${{ steps.artifact.outputs.base }}
           # Name of the resulted release archive (e.g. release-68cdf63.tar.gz).

@@ -10,6 +10,10 @@ inputs:
   artifacts_dir:
     description: 'Absolute path where the artifacts will be deployed'
     required: true
+  artifacts_lifespan:
+    description: 'The number of days after which the artifacts are deleted.'
+    required: false
+    default: '30'
   release_id:
     description: 'Name of the release where new release is installed (e.g. release-68cdf63)'
     required: true
@@ -72,6 +76,7 @@ runs:
         rm ${{ inputs.release_filename }}
         ssh server 'cd ${{env.PROJECT_DIR}} && git fetch && git checkout -f ${{ inputs.ref }} && git pull -f'
         ssh server 'cd ${{env.BUILD_DIR}} && tar zxf ${{ inputs.release_filename }} && rm ${{ inputs.release_filename }}'
+# The live directory is redundant at the moment, but will use it after https://www.drupal.org/project/drupal/issues/1792310 is fixed.
         ssh server 'rm -f ${{env.LIVE_DIR}} && ln -s ${{env.BUILD_DIR}} ${{env.LIVE_DIR}}'
         ssh server 'rm -rf ${{env.PROJECT_DIR}}/vendor && cp -R ${{env.LIVE_DIR}}/vendor ${{env.PROJECT_DIR}}/vendor'
         ssh server 'rm -rf ${{env.PROJECT_DIR}}/web/core && cp -R ${{env.LIVE_DIR}}/web/core ${{env.PROJECT_DIR}}/web/core'
@@ -81,6 +86,10 @@ runs:
         ssh server 'if [ -d ${{env.PROJECT_DIR}}/web/themes/contrib ]; then rm -rf ${{env.PROJECT_DIR}}/web/themes/contrib && cp -R ${{env.LIVE_DIR}}/web/themes/contrib ${{env.PROJECT_DIR}}/web/themes/contrib; fi'
       env:
         BUILD_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}"
-        LIVE_DIR: "${{ inputs.artifacts_dir }}/live" #The live directory is redundant at the moment, but will use it after https://www.drupal.org/project/drupal/issues/1792310 is fixed.
+        LIVE_DIR: "${{ inputs.artifacts_dir }}/live"
         PROJECT_DIR: "${{ inputs.project_dir }}"
+      shell: bash
+
+    - name: 'Clean old artifacts'
+      run:  ssh server 'cd ${{ inputs.artifacts_dir }} && find release-* -maxdepth 1 -type d -mtime +${{ inputs.artifacts_lifespan }} -prune -exec rm -rf {} \;'
       shell: bash
