@@ -75,7 +75,7 @@ runs:
         ssh server 'rm -rf ${{env.BUILD_DIR}} && mkdir -p ${{env.BUILD_DIR}}'
         scp ${{ inputs.release_filename }} server:${{env.BUILD_DIR}}/
         rm ${{ inputs.release_filename }}
-        ssh server 'cd ${{env.PROJECT_DIR}} && git fetch && git checkout -f ${{ inputs.ref }} && git pull -f'
+        ssh server 'cd ${{env.PROJECT_DIR}} && git fetch && git checkout -f ${{ inputs.ref }} && git reset --hard origin/${{ inputs.ref }}'
         ssh server 'cd ${{env.BUILD_DIR}} && tar zxf ${{ inputs.release_filename }} && rm ${{ inputs.release_filename }}'
         ssh server 'rm -f ${{env.LIVE_DIR}} && ln -s ${{env.BUILD_DIR}} ${{env.LIVE_DIR}}'
         ssh server 'rm -rf ${{env.PROJECT_DIR}}/vendor && cp -R ${{env.LIVE_DIR}}/vendor ${{env.PROJECT_DIR}}/vendor'
