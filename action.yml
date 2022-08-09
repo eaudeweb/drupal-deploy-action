@@ -1,25 +1,6 @@
 name: 'Deploy a release to the server'
 description: 'Copy and configure a new release to the target server'
 inputs:
-  ref:
-    description: 'The branch, tag or SHA to checkout.'
-    required: true
-  project_dir:
-    description: 'Absolute path where the project root is configured (where live symlink exists)'
-    required: true
-  artifacts_dir:
-    description: 'Absolute path where the artifacts will be deployed'
-    required: true
-  artifacts_lifespan:
-    description: 'The number of days after which the artifacts are deleted.'
-    required: false
-    default: '30'
-  release_id:
-    description: 'Name of the release where new release is installed (e.g. release-68cdf63)'
-    required: true
-  release_filename:
-    description: 'Name of the resulted release archive (e.g. release-68cdf63.tar.gz)'
-    required: true
   ssh_user:
     description: 'SSH user account'
     required: true
@@ -29,6 +10,34 @@ inputs:
   ssh_key:
     description: 'SSH private key'
     required: true
+  artifacts_dir:
+    description: 'Absolute path where the artifacts will be deployed'
+    required: true
+  project_dir:
+    description: 'Absolute path where the project root is configured (where live symlink exists)'
+    required: true
+  settings_file:
+    description: 'Absolute path where settings.local.php file is located'
+    required: true
+  env_file:
+    description: 'Absolute path where .env file is located'
+    required: false
+    default: ''
+  robo_file:
+    description: 'Absolute path where robo.yml file is located'
+    required: false
+    default: ''
+  public_files_dir:
+    description: 'Absolute path where public files directory is located'
+    required: true
+  private_files_dir:
+    description: 'Absolute path where private files directory is located'
+    required: false
+    default: ''
+  artifacts_lifespan:
+    description: 'The number of days after which the artifacts are deleted.'
+    required: false
+    default: '30'
   check_config:
     description: 'Check if there are configuration changes in the Drupal database not exported in config. Fail if true.'
     required: false
@@ -66,27 +75,24 @@ runs:
 
     - name: 'Create SQL database backup'
       if:  ${{ inputs.sql_backup == 'true' }}
-      run: ssh server 'cd ${{env.PROJECT_DIR}} && ./vendor/bin/drush sql:dump --structure-tables-list=cache,cache_*,watchdog,sessions,history --result-file=${{ inputs.artifacts_dir }}/database-before-${{ inputs.release_id }}.sql --gzip'
+      run: ssh server 'cd ${{env.PROJECT_DIR}} && ./vendor/bin/drush sql:dump --structure-tables-list=cache,cache_*,watchdog,sessions,history --result-file=${{ inputs.artifacts_dir }}/database-before-${{ steps.artifact.outputs.base }}.sql --gzip'
       shell: bash
 
-    # The live directory is redundant at the moment, but will use it after https://www.drupal.org/project/drupal/issues/1792310 is fixed.
     - name: 'Deploy release to the server'
       run: |
         ssh server 'rm -rf ${{env.BUILD_DIR}} && mkdir -p ${{env.BUILD_DIR}}'
-        scp ${{ inputs.release_filename }} server:${{env.BUILD_DIR}}/
-        rm ${{ inputs.release_filename }}
-        ssh server 'cd ${{env.PROJECT_DIR}} && git fetch && git checkout -f ${{ inputs.ref }} && git reset --hard ${{ inputs.ref }}'
-        ssh server 'cd ${{env.BUILD_DIR}} && tar zxf ${{ inputs.release_filename }} && rm ${{ inputs.release_filename }}'
-        ssh server 'rm -f ${{env.LIVE_DIR}} && ln -s ${{env.BUILD_DIR}} ${{env.LIVE_DIR}}'
-        ssh server 'rm -rf ${{env.PROJECT_DIR}}/vendor && cp -R ${{env.LIVE_DIR}}/vendor ${{env.PROJECT_DIR}}/vendor'
-        ssh server 'rm -rf ${{env.PROJECT_DIR}}/web/core && cp -R ${{env.LIVE_DIR}}/web/core ${{env.PROJECT_DIR}}/web/core'
-        ssh server 'if [ -d ${{env.LIVE_DIR}}/web/libraries ]; then rm -rf ${{env.PROJECT_DIR}}/web/libraries && cp -R ${{env.LIVE_DIR}}/web/libraries ${{env.PROJECT_DIR}}/web/libraries; fi'
-        ssh server 'if [ -d ${{env.LIVE_DIR}}/web/modules/contrib ]; then rm -rf ${{env.PROJECT_DIR}}/web/modules/contrib && cp -R ${{env.LIVE_DIR}}/web/modules/contrib ${{env.PROJECT_DIR}}/web/modules/contrib; fi'
-        ssh server 'if [ -d ${{env.LIVE_DIR}}/web/profiles/contrib ]; then rm -rf ${{env.PROJECT_DIR}}/web/profiles/contrib && cp -R ${{env.LIVE_DIR}}/web/profiles/contrib ${{env.PROJECT_DIR}}/web/profiles/contrib; fi'
-        ssh server 'if [ -d ${{env.LIVE_DIR}}/web/themes/contrib ]; then rm -rf ${{env.PROJECT_DIR}}/web/themes/contrib && cp -R ${{env.LIVE_DIR}}/web/themes/contrib ${{env.PROJECT_DIR}}/web/themes/contrib; fi'
+        scp ${{ env.RELEASE_FILENAME }} server:${{env.BUILD_DIR}}/
+        rm ${{ env.RELEASE_FILENAME }}
+        ssh server 'cd ${{env.BUILD_DIR}} && tar zxf ${{ env.RELEASE_FILENAME }} && rm ${{ env.RELEASE_FILENAME }}'
+        ssh server 'rm -f ${{env.PROJECT_DIR}} && ln -s ${{env.BUILD_DIR}} ${{env.PROJECT_DIR}}'
+        ssh server 'if [ "${{ inputs.settings_file }" != "" ]; then ln -s ${{ inputs.settings_file } ${{env.PROJECT_DIR}}/web/sites/default/settings.local.php; fi'
+        ssh server 'if [ "${{ inputs.env_file }" != "" ]; then ln -s ${{ inputs.env_file } ${{env.PROJECT_DIR}}/.env; fi'
+        ssh server 'if [ "${{ inputs.robo_file }" != "" ]; then ln -s ${{ inputs.robo_file } ${{env.PROJECT_DIR}}/robo.yml; fi'
+        ssh server 'if [ "${{ inputs.public_files_dir }" != "" ]; then ln -s ${{ inputs.public_files_dir } ${{env.PROJECT_DIR}}/web/sites/default/files; fi'
+        ssh server 'if [ "${{ inputs.private_files_dir }" != "" ]; then ln -s ${{ inputs.private_files_dir } ${{env.PROJECT_DIR}}/private; fi'
       env:
-        BUILD_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}"
-        LIVE_DIR: "${{ inputs.artifacts_dir }}/live"
+        BUILD_DIR: "${{ inputs.artifacts_dir }}/${{ steps.artifact.outputs.base }}"
+        RELEASE_FILENAME: "${{ steps.artifact.outputs.filename }}"
         PROJECT_DIR: "${{ inputs.project_dir }}"
       shell: bash
 
