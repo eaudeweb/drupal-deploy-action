@@ -83,13 +83,13 @@ runs:
         ssh server 'rm -rf ${{env.BUILD_DIR}} && mkdir -p ${{env.BUILD_DIR}}'
         scp ${{ env.RELEASE_FILENAME }} server:${{env.BUILD_DIR}}/
         rm ${{ env.RELEASE_FILENAME }}
-        ssh server 'cd ${{env.BUILD_DIR}} && tar zxf ${{ env.RELEASE_FILENAME }} && rm ${{ env.RELEASE_FILENAME }}'
-        ssh server 'rm -f ${{env.PROJECT_DIR}} && ln -s ${{env.BUILD_DIR}} ${{env.PROJECT_DIR}}'
-        ssh server 'if [ "${{ inputs.settings_file }" != "" ]; then ln -s ${{ inputs.settings_file } ${{env.PROJECT_DIR}}/web/sites/default/settings.local.php; fi'
-        ssh server 'if [ "${{ inputs.env_file }" != "" ]; then ln -s ${{ inputs.env_file } ${{env.PROJECT_DIR}}/.env; fi'
-        ssh server 'if [ "${{ inputs.robo_file }" != "" ]; then ln -s ${{ inputs.robo_file } ${{env.PROJECT_DIR}}/robo.yml; fi'
-        ssh server 'if [ "${{ inputs.public_files_dir }" != "" ]; then ln -s ${{ inputs.public_files_dir } ${{env.PROJECT_DIR}}/web/sites/default/files; fi'
-        ssh server 'if [ "${{ inputs.private_files_dir }" != "" ]; then ln -s ${{ inputs.private_files_dir } ${{env.PROJECT_DIR}}/private; fi'
+        ssh server 'cd ${{ env.BUILD_DIR }} && tar zxf ${{ env.RELEASE_FILENAME }} && rm ${{ env.RELEASE_FILENAME }}'
+        ssh server 'rm -f ${{ env.PROJECT_DIR }} && ln -s ${{ env.BUILD_DIR }} ${{ env.PROJECT_DIR }}'
+        ssh server 'if [ "${{ inputs.settings_file }}" != "" ]; then ln -s ${{ inputs.settings_file }} ${{env.PROJECT_DIR}}/web/sites/default/settings.local.php; fi'
+        ssh server 'if [ "${{ inputs.env_file }}" != "" ]; then ln -s ${{ inputs.env_file }} ${{env.PROJECT_DIR}}/.env; fi'
+        ssh server 'if [ "${{ inputs.robo_file }}" != "" ]; then ln -s ${{ inputs.robo_file }} ${{env.PROJECT_DIR}}/robo.yml; fi'
+        ssh server 'if [ "${{ inputs.public_files_dir }}" != "" ]; then ln -s ${{ inputs.public_files_dir }} ${{env.PROJECT_DIR}}/web/sites/default/files; fi'
+        ssh server 'if [ "${{ inputs.private_files_dir }}" != "" ]; then ln -s ${{ inputs.private_files_dir }} ${{env.PROJECT_DIR}}/private; fi'
       env:
         BUILD_DIR: "${{ inputs.artifacts_dir }}/${{ steps.artifact.outputs.base }}"
         RELEASE_FILENAME: "${{ steps.artifact.outputs.filename }}"
