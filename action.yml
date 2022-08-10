@@ -90,11 +90,11 @@ runs:
         scp ${{ inputs.release_filename }} server:${{env.BUILD_DIR}}/
         rm ${{ inputs.release_filename }}
         ssh server 'cd ${{ env.BUILD_DIR }} && tar zxf ${{ inputs.release_filename }} && rm ${{ inputs.release_filename }}'
-        ssh server 'if [ "${{ inputs.settings_file }}" != "" ]; then rm -f ${{ env.SETTINGS_FILE }} && ln -s ${{ inputs.settings_file }} ${{ env.SETTINGS_FILE }}; fi'
-        ssh server 'if [ "${{ inputs.env_file }}" != "" ]; then rm -f ${{ env.ENV_FILE }} && ln -s ${{ inputs.env_file }} ${{ env.ENV_FILE }}; fi'
-        ssh server 'if [ "${{ inputs.robo_file }}" != "" ]; then rm -f ${{ env.ROBO_FILE }} && ln -s ${{ inputs.robo_file }} ${{ env.ROBO_FILE }}; fi'
-        ssh server 'if [ "${{ inputs.public_files_dir }}" != "" ]; rm -f ${{ env.PUBLIC_FILES_DIR }} && then ln -s ${{ inputs.public_files_dir }} ${{ env.PUBLIC_FILES_DIR }}; fi'
-        ssh server 'if [ "${{ inputs.private_files_dir }}" != "" ]; rm -f ${{ env.PRIVATE_FILES_DIR }} && then ln -s ${{ inputs.private_files_dir }} ${{ env.PRIVATE_FILES_DIR }}; fi'
+        ssh server 'if [ "${{ inputs.settings_file }}" != "" ]; then ln -s ${{ inputs.settings_file }} ${{ env.SETTINGS_FILE }}; fi'
+        ssh server 'if [ "${{ inputs.env_file }}" != "" ]; then ln -s ${{ inputs.env_file }} ${{ env.ENV_FILE }}; fi'
+        ssh server 'if [ "${{ inputs.robo_file }}" != "" ]; then ln -s ${{ inputs.robo_file }} ${{ env.ROBO_FILE }}; fi'
+        ssh server 'if [ "${{ inputs.public_files_dir }}" != "" ]; then ln -s ${{ inputs.public_files_dir }} ${{ env.PUBLIC_FILES_DIR }}; fi'
+        ssh server 'if [ "${{ inputs.private_files_dir }}" != "" ]; then ln -s ${{ inputs.private_files_dir }} ${{ env.PRIVATE_FILES_DIR }}; fi'
         ssh server 'rm -f ${{ inputs.project_dir }} && ln -s ${{ env.BUILD_DIR }} ${{ inputs.project_dir }}'
       env:
         BUILD_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}"
