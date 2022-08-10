@@ -90,13 +90,19 @@ runs:
         scp ${{ inputs.release_filename }} server:${{env.BUILD_DIR}}/
         rm ${{ inputs.release_filename }}
         ssh server 'cd ${{ env.BUILD_DIR }} && tar zxf ${{ inputs.release_filename }} && rm ${{ inputs.release_filename }}'
-        ssh server 'if [ "${{ inputs.settings_file }}" != "" ]; then ln -s ${{ inputs.settings_file }} ${{ env.BUILD_DIR }}/web/sites/default/settings.local.php; fi'
-        ssh server 'if [ "${{ inputs.env_file }}" != "" ]; then ln -s ${{ inputs.env_file }} ${{ env.BUILD_DIR }}/.env; fi'
-        ssh server 'if [ "${{ inputs.robo_file }}" != "" ]; then ln -s ${{ inputs.robo_file }} ${{ env.BUILD_DIR }}/robo.yml; fi'
-        ssh server 'if [ "${{ inputs.private_files_dir }}" != "" ]; then ln -s ${{ inputs.private_files_dir }} ${{ env.BUILD_DIR }}/private; fi'
+        ssh server 'if [ "${{ inputs.settings_file }}" != "" ]; then ln -s ${{ inputs.settings_file }} ${{ env.SETTINGS_FILE }}; fi'
+        ssh server 'if [ "${{ inputs.env_file }}" != "" ]; then ln -s ${{ inputs.env_file }} ${{ env.ENV_FILE }}; fi'
+        ssh server 'if [ "${{ inputs.robo_file }}" != "" ]; then ln -s ${{ inputs.robo_file }} ${{ env.ROBO_FILE }}; fi'
+        ssh server 'if [ "${{ inputs.public_files_dir }}" != "" ]; then rm -rf ${{ env.PUBLIC_FILES_DIR }} && ln -s ${{ inputs.public_files_dir }} ${{ env.PUBLIC_FILES_DIR }}; fi'
+        ssh server 'if [ "${{ inputs.private_files_dir }}" != "" ]; then rm -f ${{ env.PRIVATE_FILES_DIR }} && ln -s ${{ inputs.private_files_dir }} ${{ env.PRIVATE_FILES_DIR }}; fi'
         ssh server 'rm -f ${{ inputs.project_dir }} && ln -s ${{ env.BUILD_DIR }} ${{ inputs.project_dir }}'
       env:
         BUILD_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}"
+        SETTINGS_FILE: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/web/sites/default/settings.local.php"
+        ENV_FILE: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/.env"
+        ROBO_FILE: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/robo.yml"
+        PUBLIC_FILES_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/web/sites/default/files"
+        PRIVATE_FILES_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/private"
       shell: bash
 
     - name: 'Clean old artifacts'
