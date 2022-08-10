@@ -93,7 +93,6 @@ runs:
         ssh server 'if [ "${{ inputs.settings_file }}" != "" ]; then ln -s ${{ inputs.settings_file }} ${{ env.BUILD_DIR }}/web/sites/default/settings.local.php; fi'
         ssh server 'if [ "${{ inputs.env_file }}" != "" ]; then ln -s ${{ inputs.env_file }} ${{ env.BUILD_DIR }}/.env; fi'
         ssh server 'if [ "${{ inputs.robo_file }}" != "" ]; then ln -s ${{ inputs.robo_file }} ${{ env.BUILD_DIR }}/robo.yml; fi'
-        ssh server 'if [ "${{ inputs.public_files_dir }}" != "" ]; then ln -s ${{ inputs.public_files_dir }} ${{ env.BUILD_DIR }}/web/sites/default/files; fi'
         ssh server 'if [ "${{ inputs.private_files_dir }}" != "" ]; then ln -s ${{ inputs.private_files_dir }} ${{ env.BUILD_DIR }}/private; fi'
         ssh server 'rm -f ${{ inputs.project_dir }} && ln -s ${{ env.BUILD_DIR }} ${{ inputs.project_dir }}'
       env:
