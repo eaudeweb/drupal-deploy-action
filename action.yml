@@ -40,7 +40,7 @@ inputs:
     description: 'Absolute path where private files directory is located'
     required: false
     default: ''
-  databased_dump_dir:
+  database_dump_dir:
     description: 'Absolute path where database dump directory is located'
     required: false
     default: ''
