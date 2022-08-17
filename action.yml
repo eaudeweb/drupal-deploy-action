@@ -40,6 +40,10 @@ inputs:
     description: 'Absolute path where private files directory is located'
     required: false
     default: ''
+  databased_dump_dir:
+    description: 'Absolute path where database dump directory is located'
+    required: false
+    default: ''
   artifacts_lifespan:
     description: 'The number of days after which the artifacts are deleted.'
     required: false
@@ -95,6 +99,7 @@ runs:
         ssh server 'if [ "${{ inputs.robo_file }}" != "" ]; then ln -s ${{ inputs.robo_file }} ${{ env.BUILD_ROBO_FILE }}; fi'
         ssh server 'if [ "${{ inputs.public_files_dir }}" != "" ]; then rm -rf ${{ env.BUILD_PUBLIC_FILES_DIR }} && ln -s ${{ inputs.public_files_dir }} ${{ env.BUILD_PUBLIC_FILES_DIR }}; fi'
         ssh server 'if [ "${{ inputs.private_files_dir }}" != "" ]; then rm -f ${{ env.BUILD_PRIVATE_FILES_DIR }} && ln -s ${{ inputs.private_files_dir }} ${{ env.BUILD_PRIVATE_FILES_DIR }}; fi'
+        ssh server 'if [ "${{ inputs.database_dump_dir }}" != "" ]; then rm -f ${{ env.BUILD_DATABASE_DUMP_DIR }} && ln -s ${{ inputs.database_dump_dir }} ${{ env.BUILD_PRIVATE_FILES_DIR }}; fi'
         ssh server 'rm -f ${{ inputs.project_dir }} && ln -s ${{ env.BUILD_DIR }} ${{ inputs.project_dir }}'
       env:
         BUILD_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}"
@@ -103,6 +108,7 @@ runs:
         BUILD_ROBO_FILE: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/robo.yml"
         BUILD_PUBLIC_FILES_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/web/sites/default/files"
         BUILD_PRIVATE_FILES_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/private"
+        BUILD_DATABASE_DUMP_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/web/sync"
       shell: bash
 
     - name: 'Clean old artifacts'
