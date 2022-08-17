@@ -3,36 +3,28 @@
 ## Usage
 
 ```yml
-on: [pull_request]
-name: Test 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
+steps:
+  - uses: actions/checkout@v3
 
-      - uses: eaudeweb/drupal-deploy-action@v2
-        with:
-          # The branch, tag or SHA to checkout.
-          ref:              test
-          # Absolute path where the project root is configured.
-          project_dir:      ${{ secrets.TEST_PROJECT_DIR }}
-          # Absolute path where the artifacts will be stored.
-          artifacts_dir:    ${{ secrets.TEST_ARTIFACTS_DIR }}
-          # The number of days after which the artifacts are deleted.
-          artifacts_lifespan:    30
-          # Name of the release where new release is installed (e.g. release-68cdf63).
-          release_id:       ${{ steps.artifact.outputs.base }}
-          # Name of the resulted release archive (e.g. release-68cdf63.tar.gz).
-          release_filename: ${{ steps.artifact.outputs.filename }}
-          # SSH user account.
-          ssh_user:         ${{ secrets.TEST_SSH_USER }}
-          # SSH host server (IP or public hostname).
-          ssh_host:         ${{ secrets.TEST_SSH_HOST }}
-          # SSH private key.
-          ssh_key:          ${{ secrets.TEST_SSH_KEY }}
-          # Check if there are configuration changes in the Drupal database not exported in config. If set to true, the
-          # script will fail if there are any changes.
-          check_config:     false
-          # Create a SQL database backup before doing the deployment (with release filename).
-          sql_backup:       false
+  - uses: eaudeweb/drupal-install-action@main
+
+  - uses: eaudeweb/drupal-artifact-action@main
+    id: artifact
+
+  - uses: eaudeweb/drupal-deploy-action@2.x
+    with:
+      ssh_user:           ${{ secrets.TEST_SSH_USER }}
+      ssh_host:           ${{ secrets.TEST_SSH_HOST }}
+      ssh_key:            ${{ secrets.TEST_SSH_KEY }}
+      release_id:         ${{ steps.artifact.outputs.base }}
+      release_filename:   ${{ steps.artifact.outputs.filename }}
+      artifacts_dir:      /var/www/artifacts/www.example.com
+      project_dir:        /var/www/html/www.example.com
+      settings_file:      /var/www/config/www.example.com/settings.local.php
+      env_file:           /var/www/config/www.example.com/.env
+      robo_file:          /var/www/config/www.example.com/robo.yml
+      public_files_dir:   /var/www/config/www.example.com/files
+      private_files_dir:  /var/www/config/www.example.com/private
+      database_dump_dir:  /var/www/config/www.example.com/sync
+      artifacts_lifespan: 30
 ```
