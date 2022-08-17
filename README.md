@@ -18,8 +18,8 @@ steps:
       ssh_key:            ${{ secrets.TEST_SSH_KEY }}
       release_id:         ${{ steps.artifact.outputs.base }}
       release_filename:   ${{ steps.artifact.outputs.filename }}
-      artifacts_dir:      /var/www/artifacts/www.example.com
       project_dir:        /var/www/html/www.example.com
+      artifacts_dir:      /var/www/artifacts/www.example.com
       settings_file:      /var/www/config/www.example.com/settings.local.php
       env_file:           /var/www/config/www.example.com/.env
       robo_file:          /var/www/config/www.example.com/robo.yml

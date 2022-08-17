@@ -16,11 +16,11 @@ inputs:
   release_filename:
     description: 'Name of the resulted release archive (e.g. release-68cdf63.tar.gz)'
     required: true
-  artifacts_dir:
-    description: 'Absolute path where the artifacts will be deployed'
-    required: true
   project_dir:
     description: 'Absolute path where the project root is configured (where live symlink exists)'
+    required: true
+  artifacts_dir:
+    description: 'Absolute path where the artifacts will be deployed'
     required: true
   settings_file:
     description: 'Absolute path where settings.local.php file is located'
