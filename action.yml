@@ -51,11 +51,11 @@ inputs:
   check_config:
     description: 'Check if there are configuration changes in the Drupal database not exported in config. Fail if true.'
     required: false
-    default: 'false'
+    default: false
   sql_backup:
     description: 'Create a SQL database backup before doing the deployment (with release filename)'
     required: false
-    default: 'false'
+    default: false
 
 runs:
   using: "composite"
@@ -79,12 +79,12 @@ runs:
       shell: bash
 
     - name: 'Check for Drupal schema changes'
-      if:  ${{ inputs.check_config == 'true' }}
+      if:  ${{ inputs.check_config == true }}
       run: ssh server 'cd ${{ inputs.project_dir }} && CONFIG_STATUS=$(./vendor/bin/drush config:status -n 2>&1) && echo ${CONFIG_STATUS} | grep -i -q -s "No differences"'
       shell: bash
 
     - name: 'Create SQL database backup'
-      if:  ${{ inputs.sql_backup == 'true' }}
+      if:  ${{ inputs.sql_backup == true }}
       run: ssh server 'cd ${{ inputs.project_dir }} && ./vendor/bin/drush sql:dump --structure-tables-list=cache,cache_*,watchdog,sessions,history --result-file=${{ inputs.artifacts_dir }}/database-before-${{ inputs.release_id }}.sql --gzip'
       shell: bash
 
