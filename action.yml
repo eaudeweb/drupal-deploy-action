@@ -45,9 +45,9 @@ inputs:
     required: false
     default: ''
   artifacts_lifespan:
-    description: 'The number of days after which the artifacts are deleted.'
+    description: 'The number of days after which the artifacts are deleted. Cleanup disabled by default'
     required: false
-    default: '30'
+    default: '0'
   check_config:
     description: 'Check if there are configuration changes in the Drupal database not exported in config. Fail if true.'
     required: false
@@ -112,5 +112,6 @@ runs:
       shell: bash
 
     - name: 'Clean old artifacts'
+      if:  ${{ inputs.artifacts_lifespan > 0 }}
       run:  ssh server 'cd ${{ inputs.artifacts_dir }} && find release-* -maxdepth 1 -type d -mtime +${{ inputs.artifacts_lifespan }} -prune -exec rm -rf {} \;'
       shell: bash
