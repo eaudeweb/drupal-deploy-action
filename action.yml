@@ -107,5 +107,5 @@ runs:
 
     - name: 'Clean old artifacts'
       if:  ${{ inputs.artifacts_lifespan > 0 }}
-      run:  ssh server 'cd ${{ inputs.artifacts_dir }} && find release-* -maxdepth 1 -type d -mtime +${{ inputs.artifacts_lifespan }} -prune -exec rm -rf {} \;'
+      run:  ssh server 'cd ${{ inputs.artifacts_dir }} && if [ 0 -lt $(ls -l | grep 'release-*' | wc -l) ]; then find release-* -maxdepth 1 -type d -mtime +${{ inputs.artifacts_lifespan }} -prune -exec rm -rf {} \;; fi
       shell: bash
