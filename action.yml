@@ -80,7 +80,8 @@ runs:
 
     - name: 'Check for Drupal schema changes'
       if:  ${{ inputs.check_config == 'true' }}
-      run: ssh server 'cd ${{ inputs.project_dir }} && CONFIG_STATUS=$(./vendor/bin/drush config:status -n 2>&1) && echo ${CONFIG_STATUS} | grep -i -q -s "No differences"'
+      run: |
+        ssh server 'cd ${{ inputs.project_dir }} && ./vendor/bin/drush config:status 2>&1 | grep -i -q -s "No differences" ; if [[ $? == 0 ]]; then echo "No changes, deployment can continue ..."; else echo "Deployment aborted due to the following changes"; echo "no" | ./vendor/bin/drush cex --diff; fi'
       shell: bash
 
     - name: 'Create SQL database backup'
