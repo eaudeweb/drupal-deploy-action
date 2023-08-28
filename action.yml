@@ -33,6 +33,10 @@ inputs:
     description: 'Absolute path where robo.yml file is located'
     required: false
     default: ''
+  drush_yml_file:
+    description: 'Absolute path to drush.yml file for this website'
+    required: false
+    default: ''
   local_services_file:
     description: 'Absolute path where local.services.yml file is located'
     required: false
@@ -98,6 +102,7 @@ runs:
         ssh server 'if [ "${{ inputs.settings_file }}" != "" ]; then ln -s ${{ inputs.settings_file }} ${{ env.BUILD_SETTINGS_FILE }}; fi'
         ssh server 'if [ "${{ inputs.env_file }}" != "" ]; then ln -s ${{ inputs.env_file }} ${{ env.BUILD_ENV_FILE }}; fi'
         ssh server 'if [ "${{ inputs.robo_file }}" != "" ]; then ln -s ${{ inputs.robo_file }} ${{ env.BUILD_ROBO_FILE }}; fi'
+        ssh server 'if [ "${{ inputs.drush_yml_file }}" != "" ]; then ln -s ${{ inputs.drush_yml_file }} ${{ env.BUILD_DRUSH_YML_FILE }}; fi'
         ssh server 'if [ "${{ inputs.local_services_file }}" != "" ]; then ln -s ${{ inputs.local_services_file }} ${{ env.BUILD_LOCAL_SERVICES_FILE }}; fi'
         ssh server 'if [ "${{ inputs.public_files_dir }}" != "" ]; then rm -rf ${{ env.BUILD_PUBLIC_FILES_DIR }} && ln -s ${{ inputs.public_files_dir }} ${{ env.BUILD_PUBLIC_FILES_DIR }}; fi'
         ssh server 'if [ "${{ inputs.database_dump_dir }}" != "" ]; then rm -f ${{ env.BUILD_DATABASE_DUMP_DIR }} && ln -s ${{ inputs.database_dump_dir }} ${{ env.BUILD_DATABASE_DUMP_DIR }}; fi'
@@ -107,6 +112,7 @@ runs:
         BUILD_SETTINGS_FILE: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/web/sites/default/settings.local.php"
         BUILD_ENV_FILE: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/.env"
         BUILD_ROBO_FILE: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/robo.yml"
+        BUILD_DRUSH_YML_FILE: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/drush/drush.yml"
         BUILD_LOCAL_SERVICES_FILE: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/web/sites/local.services.yml"
         BUILD_PUBLIC_FILES_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/web/sites/default/files"
         BUILD_DATABASE_DUMP_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/web/sync"
