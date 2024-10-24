@@ -68,6 +68,10 @@ inputs:
     description: 'Create a SQL database backup before doing the deployment (with release filename)'
     required: false
     default: 'false'
+  php:
+    description: 'Absolute path to PHP executable to use when running composer'
+    required: false
+    default: '/usr/bin/php'
 
 runs:
   using: "composite"
@@ -122,12 +126,12 @@ runs:
     - name: 'Check for Drupal schema changes'
       if:  ${{ inputs.check_config == 'true' }}
       run: |
-        ssh server 'cd ${{ inputs.project_dir }} && ./vendor/bin/drush config:status 2>&1 | grep -i -q -s "No differences" ; if [[ $? == 0 ]]; then echo "No changes, deployment can continue ..."; else echo "Deployment aborted due to the following changes"; echo "no" | ./vendor/bin/drush cex --diff; fi'
+        ssh server 'cd ${{ inputs.project_dir }} && ${{ inputs.php }} ./vendor/bin/drush config:status 2>&1 | grep -i -q -s "No differences" ; if [[ $? == 0 ]]; then echo "No changes, deployment can continue ..."; else echo "Deployment aborted due to the following changes"; echo "no" | ${{ inputs.php }} ./vendor/bin/drush cex --diff; fi'
       shell: bash
 
     - name: 'Create SQL database backup'
       if:  ${{ inputs.sql_backup == 'true' }}
-      run: ssh server 'cd ${{ inputs.project_dir }} && ./vendor/bin/drush sql:dump --structure-tables-list="cache,cache_*,watchdog,sessions,history" --result-file=${{ inputs.artifacts_dir }}/database-before-${{ inputs.release_id }}.sql --gzip'
+      run: ssh server 'cd ${{ inputs.project_dir }} && ${{ inputs.php }} ./vendor/bin/drush sql:dump --structure-tables-list="cache,cache_*,watchdog,sessions,history" --result-file=${{ inputs.artifacts_dir }}/database-before-${{ inputs.release_id }}.sql --gzip'
       shell: bash
 
     - name: 'Deploy release to the server'
