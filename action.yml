@@ -68,6 +68,10 @@ inputs:
     description: 'Create a SQL database backup before doing the deployment (with release filename)'
     required: false
     default: 'false'
+  settings_symlink_name:
+    description: 'Name of the settings file symlink to be used (default: settings.local.php)'
+    required: false
+    default: 'settings.local.php'
 
 runs:
   using: "composite"
@@ -146,7 +150,7 @@ runs:
         ssh server 'rm -f ${{ inputs.project_dir }} && ln -s ${{ env.BUILD_DIR }} ${{ inputs.project_dir }}'
       env:
         BUILD_DIR: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}"
-        BUILD_SETTINGS_FILE: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/web/sites/default/settings.local.php"
+        BUILD_SETTINGS_FILE: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/web/sites/default/${{ inputs.settings_symlink_name }}"
         BUILD_ENV_FILE: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/.env"
         BUILD_ROBO_FILE: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/robo.yml"
         BUILD_DRUSH_YML_FILE: "${{ inputs.artifacts_dir }}/${{ inputs.release_id }}/drush/drush.yml"
