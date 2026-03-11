@@ -30,4 +30,5 @@ steps:
       private_files_dir:    /var/www/config/www.example.com/private
       database_dump_dir:    /var/www/config/www.example.com/sync
       artifacts_lifespan:   30
+      delete_release_filename: false
 ```
